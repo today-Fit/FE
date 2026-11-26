@@ -6,6 +6,8 @@ import { useState } from "react";
 import {useRouter} from "next/router";
 import {signup} from "@/api/auth"
 
+const PASSWORD_RULE =  /^(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
 export default function Signup() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -19,7 +21,11 @@ export default function Signup() {
     if (loading) return;
 
     if(!name.trim()) return setError("아이디를 입력해주세요.");
-    if(!password.trim()) return setError("비밀번호를 입력해주세요.");
+    if(!PASSWORD_RULE.test(password)) {
+      return setError(
+        "비밀번호는 8자 이상이며, 영어 소문자,숫자,특수문자를 모두 포함해야 합니다."
+      )
+    }
 
     setLoading(true);
     setError(null);
