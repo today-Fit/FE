@@ -3,21 +3,47 @@
 import styled from "@emotion/styled";
 import Link from "next/link";
 import { useState } from "react";
+import {useRouter} from "next/router";
+import {signup} from "@/api/auth"
 
 export default function Signup() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (loading) return;
+
+    if(!name.trim()) return setError("아이디를 입력해주세요.");
+    if(!password.trim()) return setError("비밀번호를 입력해주세요.");
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await signup({name: name.trim(), password});
+      router.push("/login");
+    } catch(e) {
+      setError(e instanceof Error ? e.message : "알 수 없는 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <Page>
       <Card>
         <Title>회원가입</Title>
 
-        <Form onSubmit={(e) => e.preventDefault()}>
+        <Form onSubmit={handleSubmit}>
           <InputWrap>
             <IconBox>
               <UserIcon src="/assets/user.svg" alt="유저" />
             </IconBox>
-            <Input type="text" placeholder="아이디를 입력하세요" />
+            <Input type="text" placeholder="아이디를 입력하세요" autoComplete="username" value={name} onChange={e => setName(e.target.value)} />
           </InputWrap>
 
           <InputWrap>
@@ -27,6 +53,9 @@ export default function Signup() {
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="비밀번호를 입력하세요"
+              autoComplete="new-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
             />
             <EyeButton
               type="button"
@@ -41,7 +70,8 @@ export default function Signup() {
             </EyeButton>
           </InputWrap>
 
-          <SubmitButton type="submit">회원가입</SubmitButton>
+          {error && <EorrorText role="alert">{error}</EorrorText>}
+          <SubmitButton type="submit" disabled={loading}>{loading? "가입 중" : "회원가입"}</SubmitButton>
         </Form>
 
         <Footer>
@@ -68,7 +98,15 @@ const colors = {
   placeholder: "#6b7280",
   primary: "#3b82f6",
   link: "#4f9cf9",
+  error: "#f97171",
 };
+
+const EorrorText = styled.p`
+    margin: 0;
+    padding: 0 8px; 
+    color: ${colors.error};
+    font-size: 13px;
+`
 
 const Page = styled.main`
   min-height: 100vh;
