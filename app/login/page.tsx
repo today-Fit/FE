@@ -3,9 +3,14 @@
 import styled from "@emotion/styled";
 import Link from "next/link";
 import { useState } from "react";
+import {useRouter} from "next/navigation";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [landing, setLanding] = useState(false);
+  const router = useRouter();
+
 
   return (
     <Page>
