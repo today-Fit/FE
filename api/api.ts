@@ -1,6 +1,6 @@
 import type {ApiResponse} from "@/types/api";
 
-const BASE_URL = ;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export class ApiError extends Error {
   status: number;
